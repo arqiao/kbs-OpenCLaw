@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精选文章 - OpenClaw 知识库</title>
+    <link rel="stylesheet" href="../assets/style.css">
+    <style>
+        .articles-header {
+            margin-bottom: 16px;
+        }
+        .articles-header h1 { font-size: 1.6rem; font-weight: 600; }
+        .articles-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+        .stats-bar {
+            display: flex; gap: 16px; padding: 16px 0; flex-wrap: wrap;
+        }
+        .stat-item {
+            background: var(--bg); border-radius: 8px; padding: 12px 20px;
+            text-align: center; box-shadow: var(--card-shadow);
+            border: 1px solid var(--border); min-width: 100px;
+        }
+        .stat-item .num { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .stat-item .label { font-size: 0.8rem; color: var(--text-secondary); }
+        .filter-bar {
+            background: var(--bg); border-radius: 10px; padding: 16px;
+            margin: 12px 0; box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-bar select, .filter-bar input {
+            padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+            background: var(--primary-bg); color: var(--text); font-size: 0.9rem;
+        }
+        .filter-bar select { min-width: 130px; }
+        .filter-bar input { flex: 1; min-width: 180px; }
+        .sort-bar {
+            display: flex; gap: 8px; padding: 8px 0; align-items: center;
+            font-size: 0.85rem; color: var(--text-secondary);
+        }
+        .sort-btn {
+            background: none; border: 1px solid var(--border); padding: 4px 10px;
+            border-radius: 4px; cursor: pointer; color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        .sort-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .card-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+        .article-card {
+            background: var(--bg); border-radius: 10px; padding: 16px 20px;
+            box-shadow: var(--card-shadow); border: 1px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+        .article-card:hover { box-shadow: 0 4px 12px rgba(52,81,178,0.12); }
+        .card-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+        .tag {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 0.75rem; font-weight: 500;
+            background: var(--tag-bg, #eef2ff); color: var(--tag-text, #3451b2);
+        }
+        .tag.depth { background: #fef3c7; color: #92400e; }
+        .dark .tag { --tag-bg: #1e2a4a; --tag-text: #7c93e0; }
+        .dark .tag.depth { background: #422006; color: #fbbf24; }
+        .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+        .card-title a { color: var(--text); text-decoration: none; }
+        .card-title a:hover { color: var(--primary); }
+        .card-meta { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px; }
+        .card-summary {
+            font-size: 0.88rem; color: var(--text-secondary);
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .pagination {
+            display: flex; justify-content: center; gap: 6px;
+            padding: 20px 0 40px;
+        }
+        .page-btn {
+            padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+            background: var(--bg); color: var(--text); cursor: pointer;
+        }
+        .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .page-btn:disabled { opacity: 0.4; cursor: default; }
+        .empty-msg { text-align: center; padding: 60px 0; color: var(--text-secondary); }
+        @media (max-width: 640px) {
+            .filter-bar { flex-direction: column; }
+            .filter-bar select, .filter-bar input { width: 100%; }
+            .stat-item { min-width: 70px; padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header" id="site-header"></header>
+    <main class="site-main">
+        <div class="container">
+            <div class="articles-header">
+                <h1>精选文章</h1>
+                <p>ClawdBot / OpenClaw 中文资讯聚合</p>
+            </div>
+            <div id="app"></div>
+        </div>
+    </main>
+    <script src="../assets/nav.js"></script>
+    <script src="categories.js"></script>
+    <script src="articles_data.js"></script>
+    <script>
+    const PAGE_SIZE = 20;
+    let state = {
+        category: '', subCategory: '', depth: '', search: '',
+        sort: 'date_desc', page: 1
+    };
+
+    function getPrimaryCategories() {
+        return CATEGORIES.primary.map(c => c.name);
+    }
+    function getSubCategories(primaryName) {
+        const cat = CATEGORIES.primary.find(c => c.name === primaryName);
+        if (cat && cat.sub && cat.sub.length > 0) {
+            return cat.sub.map(s => s.name);
+        }
+        return [];
+    }
+    function getDepths() {
+        return CATEGORIES.depth.map(d => d.name);
+    }
+
+    function getFiltered() {
+        let list = ARTICLES_DATA.filter(a => {
+            if (state.category && a.category !== state.category) return false;
+            if (state.subCategory && a.sub_category !== state.subCategory) return false;
+            if (state.depth && a.depth !== state.depth) return false;
+            if (state.search) {
+                const q = state.search.toLowerCase();
+                if (!a.title.toLowerCase().includes(q) &&
+                    !a.source.toLowerCase().includes(q) &&
+                    !(a.summary || '').toLowerCase().includes(q)) return false;
+            }
+            return true;
+        });
+        if (state.sort === 'date_asc') list.sort((a,b) => a.date.localeCompare(b.date));
+        else if (state.sort === 'date_desc') list.sort((a,b) => b.date.localeCompare(a.date));
+        else if (state.sort === 'words') list.sort((a,b) => (b.word_count||0) - (a.word_count||0));
+        else if (state.sort === 'hotness') list.sort((a,b) => (b.hotness||0) - (a.hotness||0));
+        return list;
+    }
+
+    function render() {
+        const filtered = getFiltered();
+        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        if (state.page > totalPages) state.page = totalPages;
+        const start = (state.page - 1) * PAGE_SIZE;
+        const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+        const cats = getPrimaryCategories();
+        const subs = getSubCategories(state.category);
+        const depths = getDepths();
+
+        let html = renderStats(filtered) + renderFilters(cats, subs, depths)
+            + renderSortBar(filtered.length) + renderCards(pageItems)
+            + renderPagination(totalPages);
+        document.getElementById('app').innerHTML = html;
+        bindEvents();
+    }
+
+    function renderStats(filtered) {
+        const total = ARTICLES_DATA.length;
+        const sources = new Set(ARTICLES_DATA.map(a => a.source)).size;
+        const cats = new Set(ARTICLES_DATA.map(a => a.category).filter(Boolean)).size;
+        return `<div class="stats-bar">
+            <div class="stat-item"><div class="num">${total}</div><div class="label">文章总数</div></div>
+            <div class="stat-item"><div class="num">${filtered.length}</div><div class="label">当前筛选</div></div>
+            <div class="stat-item"><div class="num">${sources}</div><div class="label">来源数</div></div>
+            <div class="stat-item"><div class="num">${cats}</div><div class="label">分类数</div></div>
+        </div>`;
+    }
+
+    function optHtml(arr, selected, defaultLabel) {
+        let h = `<option value="">${defaultLabel}</option>`;
+        arr.forEach(v => { h += `<option value="${v}"${v===selected?' selected':''}>${v}</option>`; });
+        return h;
+    }
+
+    function renderFilters(cats, subs, depths) {
+        return `<div class="filter-bar">
+            <select id="fCat">${optHtml(cats, state.category, '全部分类')}</select>
+            <select id="fSub">${optHtml(subs, state.subCategory, '全部二级')}</select>
+            <select id="fDepth">${optHtml(depths, state.depth, '全部深度')}</select>
+            <input id="fSearch" type="text" placeholder="搜索标题/来源/摘要..." value="${state.search}">
+        </div>`;
+    }
+
+    function renderSortBar(count) {
+        const btns = [
+            ['date_desc','最新优先'], ['date_asc','最早优先'], ['hotness','热度优先'], ['words','字数最多']
+        ].map(([k,l]) => `<button class="sort-btn${state.sort===k?' active':''}" data-sort="${k}">${l}</button>`).join('');
+        return `<div class="sort-bar"><span>共 ${count} 篇</span>${btns}</div>`;
+    }
+
+    function renderCards(items) {
+        if (!items.length) return '<div class="empty-msg">没有匹配的文章</div>';
+        return '<div class="card-list">' + items.map(a => {
+            const tags = [a.category, a.sub_category].filter(Boolean)
+                .map(t => `<span class="tag">${t}</span>`).join('');
+            const depthTag = a.depth ? `<span class="tag depth">${a.depth}</span>` : '';
+            const summary = a.summary ? `<div class="card-summary">${escHtml(a.summary)}</div>` : '';
+            return `<div class="article-card">
+                <div class="card-tags">${tags}${depthTag}</div>
+                <div class="card-title"><a href="${a.url}" target="_blank">${escHtml(a.title)}</a></div>
+                <div class="card-meta">${a.date} · ${a.source}${a.word_count ? ' · '+a.word_count+'字':''}${a.hotness ? ' · 热度'+a.hotness:''}</div>
+                ${summary}
+            </div>`;
+        }).join('') + '</div>';
+    }
+
+    function renderPagination(totalPages) {
+        if (totalPages <= 1) return '';
+        let h = '<div class="pagination">';
+        h += `<button class="page-btn" data-page="${state.page-1}" ${state.page<=1?'disabled':''}>‹</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            if (totalPages > 7 && Math.abs(i - state.page) > 2 && i !== 1 && i !== totalPages) {
+                if (i === state.page - 3 || i === state.page + 3) h += '<span style="padding:0 4px">…</span>';
+                continue;
+            }
+            h += `<button class="page-btn${i===state.page?' active':''}" data-page="${i}">${i}</button>`;
+        }
+        h += `<button class="page-btn" data-page="${state.page+1}" ${state.page>=totalPages?'disabled':''}>›</button>`;
+        return h + '</div>';
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function bindEvents() {
+        document.getElementById('fCat').onchange = e => {
+            state.category = e.target.value;
+            state.subCategory = '';
+            state.page = 1;
+            render();
+        };
+        document.getElementById('fSub').onchange = e => { state.subCategory = e.target.value; state.page = 1; render(); };
+        document.getElementById('fDepth').onchange = e => { state.depth = e.target.value; state.page = 1; render(); };
+        let timer;
+        document.getElementById('fSearch').oninput = e => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { state.search = e.target.value; state.page = 1; render(); }, 300);
+        };
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.onclick = () => { state.sort = btn.dataset.sort; render(); };
+        });
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.onclick = () => {
+                const p = parseInt(btn.dataset.page);
+                if (p >= 1) { state.page = p; render(); window.scrollTo(0, 0); }
+            };
+        });
+    }
+
+    render();
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "site_name": "OpenClaw 知识库",
+  "site_desc": "ClawdBot / OpenClaw 中文知识库",
+  "nav": [
+    {
+      "name": "首页",
+      "path": "index.html",
+      "sub": []
+    },
+    {
+      "name": "产品认知",
+      "path": "product/",
+      "sub": [
+        {"name": "核心概念", "path": "product/concepts.html"},
+        {"name": "架构原理", "path": "product/architecture.html"},
+        {"name": "竞品对比", "path": "product/comparison.html"},
+        {"name": "适用场景", "path": "product/scenarios.html"}
+      ]
+    },
+    {
+      "name": "安装部署",
+      "path": "deploy/",
+      "sub": [
+        {"name": "macOS", "path": "deploy/macos.html"},
+        {"name": "Windows", "path": "deploy/windows.html"},
+        {"name": "Linux", "path": "deploy/linux.html"},
+        {"name": "Docker", "path": "deploy/docker.html"},
+        {"name": "国内云", "path": "deploy/cloud-cn.html"},
+        {"name": "国际云", "path": "deploy/cloud-intl.html"},
+        {"name": "NAS", "path": "deploy/nas.html"},
+        {"name": "手机端", "path": "deploy/mobile.html"}
+      ]
+    },
+    {
+      "name": "配置与技巧",
+      "path": "config/",
+      "sub": [
+        {"name": "MCP配置", "path": "config/mcp.html"},
+        {"name": "Prompt优化", "path": "config/prompt.html"},
+        {"name": "记忆管理", "path": "config/memory.html"},
+        {"name": "插件扩展", "path": "config/plugins.html"}
+      ]
+    },
+    {
+      "name": "生态集成",
+      "path": "integration/",
+      "sub": [
+        {"name": "飞书对接", "path": "integration/feishu.html"},
+        {"name": "微信对接", "path": "integration/wechat.html"},
+        {"name": "自动化工具", "path": "integration/automation.html"},
+        {"name": "API开发", "path": "integration/api.html"}
+      ]
+    },
+    {
+      "name": "应用实战",
+      "path": "practice/",
+      "sub": [
+        {"name": "办公自动化", "path": "practice/office.html"},
+        {"name": "开发辅助", "path": "practice/dev.html"},
+        {"name": "内容创作", "path": "practice/content.html"},
+        {"name": "数据处理", "path": "practice/data.html"}
+      ]
+    },
+    {
+      "name": "趋势展望",
+      "path": "trends/",
+      "sub": [
+        {"name": "发展历程", "path": "trends/history.html"},
+        {"name": "版本演进", "path": "trends/versions.html"},
+        {"name": "行业动态", "path": "trends/industry.html"},
+        {"name": "未来方向", "path": "trends/future.html"}
+      ]
+    },
+    {
+      "name": "精选文章",
+      "path": "articles/",
+      "sub": []
+    }
+  ]
+}
