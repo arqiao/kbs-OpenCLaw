@@ -10,30 +10,45 @@
     <header class="site-header" id="site-header"></header>
     <main class="site-main">
         <div class="container">
-            <div class="page-header">
-                <h1>生态集成</h1>
-                <p>将 OpenClaw 与各类工具和平台对接</p>
-            </div>
-            <div class="card-grid">
-                <a href="feishu.html" class="card">
-                    <h3>飞书对接</h3>
-                    <p>飞书机器人与文档集成</p>
-                </a>
-                <a href="wechat.html" class="card">
-                    <h3>微信对接</h3>
-                    <p>微信机器人与公众号集成</p>
-                </a>
-                <a href="automation.html" class="card">
-                    <h3>自动化工具</h3>
-                    <p>n8n / Make / Zapier 自动化</p>
-                </a>
-                <a href="api.html" class="card">
-                    <h3>API 开发</h3>
-                    <p>API 调用与二次开发</p>
+            <div class="page-header-row">
+                <div class="page-header">
+                    <h1 id="page-title"></h1>
+                    <p id="page-desc"></p>
+                </div>
+                <a href="../articles/" class="articles-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h10"/>
+                    </svg>
+                    <span id="articles-link-text"></span>
                 </a>
             </div>
+            <div class="card-grid" id="card-grid"></div>
         </div>
     </main>
+    <script src="../assets/i18n.js"></script>
     <script src="../assets/nav.js"></script>
+    <script>
+    const CARDS = [
+        { href: 'feishu.html', titleKey: 'feishu', descKey: 'feishuDesc' },
+        { href: 'wechat.html', titleKey: 'wechat', descKey: 'wechatDesc' },
+        { href: 'automation.html', titleKey: 'automation', descKey: 'automationDesc' },
+        { href: 'api.html', titleKey: 'api', descKey: 'apiDesc' },
+    ];
+    function updatePageLanguage() {
+        document.getElementById('page-title').textContent = t('integration');
+        document.getElementById('page-desc').textContent = t('integrationDesc');
+        document.getElementById('articles-link-text').textContent = t('articles');
+        document.title = t('integration') + ' - ' + t('siteName');
+        let html = '';
+        for (const card of CARDS) {
+            html += `<a href="${card.href}" class="card">
+                <h3>${t(card.titleKey)}</h3>
+                <p>${t(card.descKey)}</p>
+            </a>`;
+        }
+        document.getElementById('card-grid').innerHTML = html;
+    }
+    updatePageLanguage();
+    </script>
 </body>
 </html>

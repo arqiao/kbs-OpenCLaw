@@ -10,30 +10,45 @@
     <header class="site-header" id="site-header"></header>
     <main class="site-main">
         <div class="container">
-            <div class="page-header">
-                <h1>趋势展望</h1>
-                <p>OpenClaw 的过去、现在与未来</p>
-            </div>
-            <div class="card-grid">
-                <a href="history.html" class="card">
-                    <h3>发展历程</h3>
-                    <p>从 Clawdbot 到 OpenClaw 的演进</p>
-                </a>
-                <a href="versions.html" class="card">
-                    <h3>版本演进</h3>
-                    <p>主要版本更新与功能变化</p>
-                </a>
-                <a href="industry.html" class="card">
-                    <h3>行业动态</h3>
-                    <p>AI Agent 行业观察与分析</p>
-                </a>
-                <a href="future.html" class="card">
-                    <h3>未来方向</h3>
-                    <p>发展趋势与技术展望</p>
+            <div class="page-header-row">
+                <div class="page-header">
+                    <h1 id="page-title"></h1>
+                    <p id="page-desc"></p>
+                </div>
+                <a href="../articles/" class="articles-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h10"/>
+                    </svg>
+                    <span id="articles-link-text"></span>
                 </a>
             </div>
+            <div class="card-grid" id="card-grid"></div>
         </div>
     </main>
+    <script src="../assets/i18n.js"></script>
     <script src="../assets/nav.js"></script>
+    <script>
+    const CARDS = [
+        { href: 'history.html', titleKey: 'history', descKey: 'historyDesc' },
+        { href: 'versions.html', titleKey: 'versions', descKey: 'versionsDesc' },
+        { href: 'industry.html', titleKey: 'industry', descKey: 'industryDesc' },
+        { href: 'future.html', titleKey: 'future', descKey: 'futureDesc' },
+    ];
+    function updatePageLanguage() {
+        document.getElementById('page-title').textContent = t('trends');
+        document.getElementById('page-desc').textContent = t('trendsDesc');
+        document.getElementById('articles-link-text').textContent = t('articles');
+        document.title = t('trends') + ' - ' + t('siteName');
+        let html = '';
+        for (const card of CARDS) {
+            html += `<a href="${card.href}" class="card">
+                <h3>${t(card.titleKey)}</h3>
+                <p>${t(card.descKey)}</p>
+            </a>`;
+        }
+        document.getElementById('card-grid').innerHTML = html;
+    }
+    updatePageLanguage();
+    </script>
 </body>
 </html>

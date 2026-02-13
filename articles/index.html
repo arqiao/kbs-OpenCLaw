@@ -91,12 +91,13 @@
     <main class="site-main">
         <div class="container">
             <div class="articles-header">
-                <h1>精选文章</h1>
-                <p>ClawdBot / OpenClaw 中文资讯聚合</p>
+                <h1 id="articles-title"></h1>
+                <p id="articles-desc"></p>
             </div>
             <div id="app"></div>
         </div>
     </main>
+    <script src="../assets/i18n.js?v=2"></script>
     <script src="../assets/nav.js"></script>
     <script src="categories.js"></script>
     <script src="articles_data.js"></script>
@@ -164,10 +165,10 @@
         const sources = new Set(ARTICLES_DATA.map(a => a.source)).size;
         const cats = new Set(ARTICLES_DATA.map(a => a.category).filter(Boolean)).size;
         return `<div class="stats-bar">
-            <div class="stat-item"><div class="num">${total}</div><div class="label">文章总数</div></div>
-            <div class="stat-item"><div class="num">${filtered.length}</div><div class="label">当前筛选</div></div>
-            <div class="stat-item"><div class="num">${sources}</div><div class="label">来源数</div></div>
-            <div class="stat-item"><div class="num">${cats}</div><div class="label">分类数</div></div>
+            <div class="stat-item"><div class="num">${total}</div><div class="label">${t('totalArticles')}</div></div>
+            <div class="stat-item"><div class="num">${filtered.length}</div><div class="label">${t('currentFilter')}</div></div>
+            <div class="stat-item"><div class="num">${sources}</div><div class="label">${t('sourceCount')}</div></div>
+            <div class="stat-item"><div class="num">${cats}</div><div class="label">${t('categoryCount')}</div></div>
         </div>`;
     }
 
@@ -179,31 +180,34 @@
 
     function renderFilters(cats, subs, depths) {
         return `<div class="filter-bar">
-            <select id="fCat">${optHtml(cats, state.category, '全部分类')}</select>
-            <select id="fSub">${optHtml(subs, state.subCategory, '全部二级')}</select>
-            <select id="fDepth">${optHtml(depths, state.depth, '全部深度')}</select>
-            <input id="fSearch" type="text" placeholder="搜索标题/来源/摘要..." value="${state.search}">
+            <select id="fCat">${optHtml(cats, state.category, t('allCategories'))}</select>
+            <select id="fSub">${optHtml(subs, state.subCategory, t('allSubCategories'))}</select>
+            <select id="fDepth">${optHtml(depths, state.depth, t('allDepths'))}</select>
+            <input id="fSearch" type="text" placeholder="${t('searchPlaceholder')}" value="${state.search}">
         </div>`;
     }
 
     function renderSortBar(count) {
         const btns = [
-            ['date_desc','最新优先'], ['date_asc','最早优先'], ['hotness','热度优先'], ['words','字数最多']
+            ['date_desc', t('newestFirst')], ['date_asc', t('oldestFirst')],
+            ['hotness', t('hotnessFirst')], ['words', t('mostWords')]
         ].map(([k,l]) => `<button class="sort-btn${state.sort===k?' active':''}" data-sort="${k}">${l}</button>`).join('');
-        return `<div class="sort-bar"><span>共 ${count} 篇</span>${btns}</div>`;
+        return `<div class="sort-bar"><span>${t('total')} ${count} ${t('articles_unit')}</span>${btns}</div>`;
     }
 
     function renderCards(items) {
-        if (!items.length) return '<div class="empty-msg">没有匹配的文章</div>';
+        if (!items.length) return `<div class="empty-msg">${t('noMatch')}</div>`;
         return '<div class="card-list">' + items.map(a => {
             const tags = [a.category, a.sub_category].filter(Boolean)
                 .map(t => `<span class="tag">${t}</span>`).join('');
             const depthTag = a.depth ? `<span class="tag depth">${a.depth}</span>` : '';
             const summary = a.summary ? `<div class="card-summary">${escHtml(a.summary)}</div>` : '';
+            const wordInfo = a.word_count ? ` · ${a.word_count}${t('words')}` : '';
+            const hotInfo = a.hotness ? ` · ${t('hotness')}${a.hotness}` : '';
             return `<div class="article-card">
                 <div class="card-tags">${tags}${depthTag}</div>
                 <div class="card-title"><a href="${a.url}" target="_blank">${escHtml(a.title)}</a></div>
-                <div class="card-meta">${a.date} · ${a.source}${a.word_count ? ' · '+a.word_count+'字':''}${a.hotness ? ' · 热度'+a.hotness:''}</div>
+                <div class="card-meta">${a.date} · ${a.source}${wordInfo}${hotInfo}</div>
                 ${summary}
             </div>`;
         }).join('') + '</div>';
@@ -253,7 +257,14 @@
         });
     }
 
-    render();
+    function updatePageLanguage() {
+        document.getElementById('articles-title').textContent = t('articlesTitle');
+        document.getElementById('articles-desc').textContent = t('articlesDesc');
+        document.title = t('articlesTitle') + ' - ' + t('siteName');
+        render();
+    }
+
+    updatePageLanguage();
     </script>
 </body>
 </html>

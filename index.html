@@ -10,43 +10,50 @@
     <header class="site-header" id="site-header"></header>
     <main class="site-main">
         <div class="container">
-            <div class="page-header">
-                <h1>OpenClaw 知识库</h1>
-                <p>ClawdBot / OpenClaw 中文知识库 · 基于 142 篇精选文章萃取整理</p>
+            <div class="page-header-row">
+                <div class="page-header">
+                    <h1 id="page-title"></h1>
+                    <p id="page-desc"></p>
+                </div>
+                <a href="articles/" class="articles-link" id="articles-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h10"/>
+                    </svg>
+                    <span id="articles-link-text"></span>
+                </a>
             </div>
 
-            <div class="card-grid">
-                <a href="product/" class="card">
-                    <h3>产品认知</h3>
-                    <p>了解 OpenClaw 的核心概念、架构原理、与竞品对比及适用场景</p>
-                </a>
-                <a href="deploy/" class="card">
-                    <h3>安装部署</h3>
-                    <p>macOS / Windows / Linux / Docker / 云平台 / NAS / 手机端部署指南</p>
-                </a>
-                <a href="config/" class="card">
-                    <h3>配置与技巧</h3>
-                    <p>MCP 配置、Prompt 优化、记忆管理、插件扩展等进阶技巧</p>
-                </a>
-                <a href="integration/" class="card">
-                    <h3>生态集成</h3>
-                    <p>飞书、微信对接，n8n 自动化工具，API 开发指南</p>
-                </a>
-                <a href="practice/" class="card">
-                    <h3>应用实战</h3>
-                    <p>办公自动化、开发辅助、内容创作、数据处理实战案例</p>
-                </a>
-                <a href="trends/" class="card">
-                    <h3>趋势展望</h3>
-                    <p>OpenClaw 发展历程、版本演进、行业动态与未来方向</p>
-                </a>
-                <a href="articles/" class="card">
-                    <h3>精选文章</h3>
-                    <p>142 篇原始文章，支持分类筛选、搜索、排序</p>
-                </a>
-            </div>
+            <div class="card-grid" id="card-grid"></div>
         </div>
     </main>
+    <script src="assets/i18n.js"></script>
     <script src="assets/nav.js"></script>
+    <script>
+    const CARDS = [
+        { href: 'product/', titleKey: 'product', descKey: 'productDesc' },
+        { href: 'deploy/', titleKey: 'deploy', descKey: 'deployDesc' },
+        { href: 'config/', titleKey: 'config', descKey: 'configDesc' },
+        { href: 'integration/', titleKey: 'integration', descKey: 'integrationDesc' },
+        { href: 'practice/', titleKey: 'practice', descKey: 'practiceDesc' },
+        { href: 'trends/', titleKey: 'trends', descKey: 'trendsDesc' },
+    ];
+
+    function updatePageLanguage() {
+        document.getElementById('page-title').textContent = t('homeTitle');
+        document.getElementById('page-desc').textContent = t('homeDesc');
+        document.getElementById('articles-link-text').textContent = t('articles');
+        let html = '';
+        for (const card of CARDS) {
+            html += `<a href="${card.href}" class="card">
+                <h3>${t(card.titleKey)}</h3>
+                <p>${t(card.descKey)}</p>
+            </a>`;
+        }
+        document.getElementById('card-grid').innerHTML = html;
+        document.title = t('siteName');
+    }
+
+    updatePageLanguage();
+    </script>
 </body>
 </html>

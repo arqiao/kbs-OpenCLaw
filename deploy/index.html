@@ -10,46 +10,49 @@
     <header class="site-header" id="site-header"></header>
     <main class="site-main">
         <div class="container">
-            <div class="page-header">
-                <h1>安装部署</h1>
-                <p>选择你的平台，快速上手 OpenClaw</p>
-            </div>
-            <div class="card-grid">
-                <a href="macos.html" class="card">
-                    <h3>macOS</h3>
-                    <p>Mac 本地部署，支持 Mac mini / MacBook</p>
-                </a>
-                <a href="windows.html" class="card">
-                    <h3>Windows</h3>
-                    <p>Windows 本地部署指南</p>
-                </a>
-                <a href="linux.html" class="card">
-                    <h3>Linux</h3>
-                    <p>Ubuntu / Debian / CentOS 部署</p>
-                </a>
-                <a href="docker.html" class="card">
-                    <h3>Docker</h3>
-                    <p>容器化部署，一键启动</p>
-                </a>
-                <a href="cloud-cn.html" class="card">
-                    <h3>国内云</h3>
-                    <p>阿里云 / 腾讯云 / 华为云部署</p>
-                </a>
-                <a href="cloud-intl.html" class="card">
-                    <h3>国际云</h3>
-                    <p>AWS / Azure / GCP 部署</p>
-                </a>
-                <a href="nas.html" class="card">
-                    <h3>NAS</h3>
-                    <p>群晖 / Unraid 家庭服务器部署</p>
-                </a>
-                <a href="mobile.html" class="card">
-                    <h3>手机端</h3>
-                    <p>手机远程访问与控制</p>
+            <div class="page-header-row">
+                <div class="page-header">
+                    <h1 id="page-title"></h1>
+                    <p id="page-desc"></p>
+                </div>
+                <a href="../articles/" class="articles-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h10"/>
+                    </svg>
+                    <span id="articles-link-text"></span>
                 </a>
             </div>
+            <div class="card-grid" id="card-grid"></div>
         </div>
     </main>
+    <script src="../assets/i18n.js"></script>
     <script src="../assets/nav.js"></script>
+    <script>
+    const CARDS = [
+        { href: 'macos.html', titleKey: 'macos', descKey: 'macosDesc' },
+        { href: 'windows.html', titleKey: 'windows', descKey: 'windowsDesc' },
+        { href: 'linux.html', titleKey: 'linux', descKey: 'linuxDesc' },
+        { href: 'docker.html', titleKey: 'docker', descKey: 'dockerDesc' },
+        { href: 'cloud-cn.html', titleKey: 'cloudCn', descKey: 'cloudCnDesc' },
+        { href: 'cloud-intl.html', titleKey: 'cloudIntl', descKey: 'cloudIntlDesc' },
+        { href: 'nas.html', titleKey: 'nas', descKey: 'nasDesc' },
+        { href: 'mobile.html', titleKey: 'mobile', descKey: 'mobileDesc' },
+    ];
+    function updatePageLanguage() {
+        document.getElementById('page-title').textContent = t('deploy');
+        document.getElementById('page-desc').textContent = t('deployDesc');
+        document.getElementById('articles-link-text').textContent = t('articles');
+        document.title = t('deploy') + ' - ' + t('siteName');
+        let html = '';
+        for (const card of CARDS) {
+            html += `<a href="${card.href}" class="card">
+                <h3>${t(card.titleKey)}</h3>
+                <p>${t(card.descKey)}</p>
+            </a>`;
+        }
+        document.getElementById('card-grid').innerHTML = html;
+    }
+    updatePageLanguage();
+    </script>
 </body>
 </html>
